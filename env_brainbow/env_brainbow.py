@@ -76,6 +76,7 @@ class EnvBrainbow(gym.Env):
         ...
         img volume n-1 : p_n1, p_n2, ..., p_nm
         order is p_11 -> p_21 -> p_31 -> ... -> p_12 -> ... -> p_nm
+        m = max(coord_len_list) duplicated for empty slot
         '''
         # select image volume, coordinate
         self.cur_vol = (self.cur_vol + 1) % self.num_volume
