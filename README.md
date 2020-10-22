@@ -7,4 +7,5 @@ This is 2D version.
 ```
 >> python -m env_brainbow.test_env
 >> python -m env_brainbow.test_agent
+>> python -m examples.dqn_and_double_dqn
 ```
