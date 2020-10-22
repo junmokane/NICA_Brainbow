@@ -13,12 +13,13 @@ obs = env.reset()
 
 for _ in range(10000):
     env.render()
-    #fig = plt.figure(figsize=(10, 10))
-    #plt.imshow((obs * 33 + 128).astype(np.uint8), vmin=0, vmax=255)
-    #plt.show()
-    #plt.close()
+    fig = plt.figure(figsize=(10, 10))
+    plt.imshow((obs * 33 + 128).astype(np.uint8), vmin=0, vmax=255)
+    plt.show()
+    plt.close()
     #time.sleep(0.1)
     obs, rew, done, info = env.step(1)
+    print(rew)
     if done:
         obs = env.reset()
 

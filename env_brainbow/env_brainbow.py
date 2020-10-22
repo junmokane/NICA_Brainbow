@@ -34,6 +34,7 @@ class EnvBrainbow(gym.Env):
         ''' -------------------------------------- '''
         ''' parameters defined every env.reset()   '''
         self.start_point = None  # starting point
+        self.start_color = None  # starting color
         self.cur_point = None  # current point
         self.cur_vol = -1  # current volume
         self.cur_ind = -1  # current index
@@ -50,20 +51,22 @@ class EnvBrainbow(gym.Env):
 
     def step(self, action):
         if action == 0:  # no move
-            return np.zeros((self.fov, self.fov, self.num_ch)), 0, True, {}
+            return np.zeros((self.fov, self.fov, self.num_ch)), 1, True, {}
         elif action == 1:  # move
-            self.cur_point = self.cur_point + self.cur_dir_offset
-            self.offset_list.append(self.cur_point)
             # if out of boundary, terminate
+            self.cur_point = self.cur_point + self.cur_dir_offset
             if not self.is_fov_boundary(self.img_volume_shape, self.cur_point):
-                return np.zeros((self.fov, self.fov, self.num_ch)), 0, True, {}
+                return np.zeros((self.fov, self.fov, self.num_ch)), 1, True, {}
 
+            self.offset_list.append(self.cur_point)
+            rew = 1 if np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]) else -1
+
+            # get patch and rotate the image if required
             patch = self.img_volume[self.cur_point[0] - self.rad:self.cur_point[0] + self.rad + 1,
-                                    self.cur_point[1] - self.rad:self.cur_point[1] + self.rad + 1]  # (fov, fov, 3)
-            # rotate the image if required
+                    self.cur_point[1] - self.rad:self.cur_point[1] + self.rad + 1]  # (fov, fov, 3)
             if self.cur_rotate is not None:
                 patch = cv2.rotate(patch, self.cur_rotate)
-            rew = 1
+
             return patch, rew, False, {}
 
     def reset(self):
@@ -90,6 +93,7 @@ class EnvBrainbow(gym.Env):
         self.img_volume = self.img_volume[self.start_point[0]]  # (y, x, 3)
         self.img_volume_shape = self.img_volume.shape
         self.start_point = self.start_point[1:]  # [y, x]
+        self.start_color = self.img_volume[self.start_point[0], self.start_point[1]]
 
         # start skeletonization
         self.cur_point = self.start_point
