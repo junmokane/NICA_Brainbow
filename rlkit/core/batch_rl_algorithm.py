@@ -61,7 +61,6 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
                 discard_incomplete_paths=True,
             )
             gt.stamp('evaluation sampling')
-
             for _ in range(self.num_train_loops_per_epoch):
                 new_expl_paths = self.expl_data_collector.collect_new_paths(
                     self.max_path_length,

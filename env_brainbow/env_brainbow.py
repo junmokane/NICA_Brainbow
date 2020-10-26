@@ -51,15 +51,18 @@ class EnvBrainbow(gym.Env):
 
     def step(self, action):
         if action == 0:  # no move
-            return np.zeros((self.fov * self.fov * self.num_ch)), 1, True, {}
+            return np.zeros((self.fov * self.fov * self.num_ch)), 0, True, {}
         elif action == 1:  # move
-            # if out of boundary, terminate
+            # if out of boundary, terminate with 0 reward
             self.cur_point = self.cur_point + self.cur_dir_offset
             if not self.is_fov_boundary(self.img_volume_shape, self.cur_point):
-                return np.zeros((self.fov * self.fov * self.num_ch)), 1, True, {}
+                return np.zeros((self.fov * self.fov * self.num_ch)), 0, True, {}
 
             self.offset_list.append(self.cur_point)
-            rew = 1 if np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]) else -1
+
+            # if color is not matched, terminate with -1 reward
+            if not np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]):
+                return np.zeros((self.fov * self.fov * self.num_ch)), -1, True, {}
 
             # get patch and rotate the image if required
             patch = self.img_volume[self.cur_point[0] - self.rad:self.cur_point[0] + self.rad + 1,
@@ -67,7 +70,7 @@ class EnvBrainbow(gym.Env):
             if self.cur_rotate is not None:
                 patch = cv2.rotate(patch, self.cur_rotate)
 
-            return np.moveaxis(patch, -1, 0).flatten(), rew, False, {}
+            return np.moveaxis(patch, -1, 0).flatten(), 1, False, {}
 
     def reset(self):
         '''

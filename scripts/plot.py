@@ -14,7 +14,7 @@ def plot_one(exp_names, csv_slices, feature):
         plt.plot(csv_slice[feature].to_numpy())
     plt.legend(exp_names)
     plt.title(feature, fontsize=17)
-    plt.xlabel("iteration", fontsize=15)
+    plt.xlabel("Epochs", fontsize=15)
     plt.xticks(fontsize=13)
     plt.ylabel(feature, fontsize=15)
     plt.yticks(fontsize=13)
