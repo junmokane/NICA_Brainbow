@@ -45,18 +45,18 @@ class EnvBrainbow(gym.Env):
         self.img_volume = None  # current image volume
         self.img_volume_shape = None  # current image volume shape
         ''' -------------------------------------- '''
-        self.observation_space = spaces.Box(low=-4.0, high=4.0, shape=(fov, fov, 3))
+        self.observation_space = spaces.Box(low=-4.0, high=4.0, shape=(fov*fov*num_ch,))
         self.action_space = spaces.Discrete(2)  # 0 no move, 1 move
         self.viewer = None
 
     def step(self, action):
         if action == 0:  # no move
-            return np.zeros((self.fov, self.fov, self.num_ch)), 1, True, {}
+            return np.zeros((self.fov * self.fov * self.num_ch)), 1, True, {}
         elif action == 1:  # move
             # if out of boundary, terminate
             self.cur_point = self.cur_point + self.cur_dir_offset
             if not self.is_fov_boundary(self.img_volume_shape, self.cur_point):
-                return np.zeros((self.fov, self.fov, self.num_ch)), 1, True, {}
+                return np.zeros((self.fov * self.fov * self.num_ch)), 1, True, {}
 
             self.offset_list.append(self.cur_point)
             rew = 1 if np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]) else -1
@@ -67,7 +67,7 @@ class EnvBrainbow(gym.Env):
             if self.cur_rotate is not None:
                 patch = cv2.rotate(patch, self.cur_rotate)
 
-            return patch, rew, False, {}
+            return np.moveaxis(patch, -1, 0).flatten(), rew, False, {}
 
     def reset(self):
         '''
@@ -105,7 +105,7 @@ class EnvBrainbow(gym.Env):
         # rotate the image if required
         if self.cur_rotate is not None:
             patch = cv2.rotate(patch, self.cur_rotate)
-        return patch
+        return np.moveaxis(patch, -1, 0).flatten()
 
     def render(self, mode='human'):
         self.img_volume_copy = np.copy(self.img_volume)  # (y, x, 3)
