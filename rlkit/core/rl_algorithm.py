@@ -52,10 +52,9 @@ class BaseRLAlgorithm(object, metaclass=abc.ABCMeta):
         raise NotImplementedError('_train must implemented by inherited class')
 
     def _end_epoch(self, epoch):
-        if not self.trainer.discrete:
-            snapshot = self._get_snapshot()
-            logger.save_itr_params(epoch, snapshot)
-            gt.stamp('saving')
+        snapshot = self._get_snapshot()
+        logger.save_itr_params(epoch, snapshot)
+        gt.stamp('saving')
         self._log_stats(epoch)
 
         self.expl_data_collector.end_epoch(epoch)
@@ -102,17 +101,15 @@ class BaseRLAlgorithm(object, metaclass=abc.ABCMeta):
             prefix='exploration/'
         )
         expl_paths = self.expl_data_collector.get_epoch_paths()
-        # import ipdb; ipdb.set_trace()
         if hasattr(self.expl_env, 'get_diagnostics'):
             logger.record_dict(
                 self.expl_env.get_diagnostics(expl_paths),
                 prefix='exploration/',
             )
-        if not self.batch_rl or self.eval_both:
-            logger.record_dict(
-                eval_util.get_generic_path_information(expl_paths),
-                prefix="exploration/",
-            )
+        logger.record_dict(
+            eval_util.get_generic_path_information(expl_paths),
+            prefix="exploration/",
+        )
         """
         Evaluation
         """

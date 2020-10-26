@@ -1,5 +1,3 @@
-import os, sys
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from rlkit.samplers.rollout_functions import rollout
 from rlkit.torch.pytorch_util import set_gpu_mode
 import argparse
@@ -12,13 +10,7 @@ filename = str(uuid.uuid4())
 
 def simulate_policy(args):
     data = torch.load(args.file)
-    print(data)
-    # policy = data['evaluation/policy']
-    '''
-    I don't know why but they did not save the policy for evalutaion.
-    Instead of that, I used trainer/policy
-    '''
-    policy = data['trainer/policy']
+    policy = data['evaluation/policy']
     env = data['evaluation/env']
     print("Policy loaded")
     if args.gpu:
@@ -40,9 +32,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str,
                         help='path to the snapshot file')
-    parser.add_argument('--H', type=int, default=300,
+    parser.add_argument('--H', type=int, default=10000,
                         help='Max length of rollout')
     parser.add_argument('--gpu', action='store_false')
     args = parser.parse_args()
-    print(args)
+
     simulate_policy(args)

@@ -1,9 +1,6 @@
 """
 Example of running PyTorch implementation of DDPG on HalfCheetah.
 """
-import sys
-import os
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
 import copy
 
 from gym.envs.mujoco import HalfCheetahEnv
@@ -16,7 +13,7 @@ from rlkit.exploration_strategies.base import (
 from rlkit.exploration_strategies.ou_strategy import OUStrategy
 from rlkit.launchers.launcher_util import setup_logger
 from rlkit.samplers.data_collector import MdpPathCollector
-from rlkit.torch.networks import FlattenMlp, TanhMlpPolicy
+from rlkit.torch.networks import ConcatMlp, TanhMlpPolicy
 from rlkit.torch.ddpg.ddpg import DDPGTrainer
 import rlkit.torch.pytorch_util as ptu
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
@@ -30,7 +27,7 @@ def experiment(variant):
     # env = NormalizedBoxEnv(gym.make('HalfCheetah-v1'))
     obs_dim = eval_env.observation_space.low.size
     action_dim = eval_env.action_space.low.size
-    qf = FlattenMlp(
+    qf = ConcatMlp(
         input_size=obs_dim + action_dim,
         output_size=1,
         **variant['qf_kwargs']
@@ -73,7 +70,7 @@ if __name__ == "__main__":
     # noinspection PyTypeChecker
     variant = dict(
         algorithm_kwargs=dict(
-            num_epochs=10,
+            num_epochs=1000,
             num_eval_steps_per_epoch=1000,
             num_trains_per_train_loop=1000,
             num_expl_steps_per_train_loop=1000,
@@ -96,7 +93,6 @@ if __name__ == "__main__":
         ),
         replay_buffer_size=int(1E6),
     )
-    ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
+    # ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
     setup_logger('name-of-experiment', variant=variant)
-    ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
     experiment(variant)

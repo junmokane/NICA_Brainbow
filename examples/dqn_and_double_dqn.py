@@ -1,9 +1,10 @@
 """
-Run DQN on grid world.
+Run DQN on CartPole-v0.
 """
+
+import argparse
 import gym
 from torch import nn as nn
-import argparse
 
 from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy
@@ -19,8 +20,8 @@ from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
 
 def experiment(variant):
-    expl_env = gym.make(args.env)
-    eval_env = gym.make(args.env)
+    expl_env = gym.make(args.env).env
+    eval_env = gym.make(args.env).env
     obs_dim = expl_env.observation_space.low.size
     action_dim = eval_env.action_space.n
 
@@ -71,8 +72,6 @@ def experiment(variant):
     algorithm.train()
 
 
-
-
 if __name__ == "__main__":
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description='DQN-runs')
@@ -100,7 +99,6 @@ if __name__ == "__main__":
             learning_rate=3E-4,
         ),
     )
-
     setup_logger(exp_prefix='dqn-' + args.env,
                  variant=variant,
                  text_log_file="debug.log",
@@ -114,7 +112,7 @@ if __name__ == "__main__":
                  script_name=None,
                  # **create_log_dir_kwargs
                  base_log_dir='./data',
-                 exp_id=3,
+                 exp_id=0,
                  seed=0)
     ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
     experiment(variant)

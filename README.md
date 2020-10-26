@@ -8,4 +8,5 @@ This is 2D version.
 >> python -m env_brainbow.test_env
 >> python -m env_brainbow.test_agent
 >> python -m examples.dqn_and_double_dqn
+>> python scripts/plot.py ./data/dqn-CartPole-v0/ --f "evaluation/Returns Mean,evaluation/Returns Max"
 ```
