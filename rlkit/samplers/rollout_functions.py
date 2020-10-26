@@ -1,5 +1,6 @@
 from functools import partial
 
+import time
 import numpy as np
 import copy
 
@@ -79,6 +80,7 @@ def rollout(
         return_dict_obs=False,
         full_o_postprocess_func=None,
         reset_callback=None,
+        sleep=1,  # time sleep
 ):
     if render_kwargs is None:
         render_kwargs = {}
@@ -102,6 +104,7 @@ def rollout(
         reset_callback(env, agent, o)
     if render:
         env.render(**render_kwargs)
+        time.sleep(sleep)
     while path_length < max_path_length:
         raw_obs.append(o)
         o_for_agent = preprocess_obs_for_policy_fn(o)
@@ -113,6 +116,7 @@ def rollout(
         next_o, r, d, env_info = env.step(copy.deepcopy(a))
         if render:
             env.render(**render_kwargs)
+            time.sleep(sleep)
         observations.append(o)
         rewards.append(r)
         terminals.append(d)

@@ -193,18 +193,21 @@ class EnvBrainbow(gym.Env):
 
         :param color: list of color range from 0 to 255 ex. [255, 0, 0]
         '''
-        if mask.dtype == np.float32:
-            color = np.array(color, dtype=np.float32)
-            color = color / 255
-            mask[y + delta, x - delta:x + delta + 1] = color
-            mask[y - delta, x - delta:x + delta + 1] = color
-            mask[y - delta:y + delta + 1, x + delta] = color
-            mask[y - delta:y + delta + 1, x - delta] = color
-        elif mask.dtype == np.uint8:
-            color = np.array(color, dtype=np.uint8)
-            mask[y + delta, x - delta:x + delta + 1] = color
-            mask[y - delta, x - delta:x + delta + 1] = color
-            mask[y - delta:y + delta + 1, x + delta] = color
-            mask[y - delta:y + delta + 1, x - delta] = color
+        if self.is_fov_boundary(self.img_volume_shape, [y, x]):
+            if mask.dtype == np.float32:
+                color = np.array(color, dtype=np.float32)
+                color = color / 255
+                mask[y + delta, x - delta:x + delta + 1] = color
+                mask[y - delta, x - delta:x + delta + 1] = color
+                mask[y - delta:y + delta + 1, x + delta] = color
+                mask[y - delta:y + delta + 1, x - delta] = color
+            elif mask.dtype == np.uint8:
+                color = np.array(color, dtype=np.uint8)
+                mask[y + delta, x - delta:x + delta + 1] = color
+                mask[y - delta, x - delta:x + delta + 1] = color
+                mask[y - delta:y + delta + 1, x + delta] = color
+                mask[y - delta:y + delta + 1, x - delta] = color
+            else:
+                pass
         else:
             pass
