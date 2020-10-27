@@ -3,7 +3,10 @@ from rlkit.torch.pytorch_util import set_gpu_mode
 import argparse
 import torch
 import uuid
+import numpy as np
+import matplotlib.pyplot as plt
 from rlkit.core import logger
+
 
 filename = str(uuid.uuid4())
 
@@ -16,7 +19,8 @@ def simulate_policy(args):
     if args.gpu:
         set_gpu_mode(True)
         policy.cuda()
-    while True:
+    num_fail = 0
+    for _ in range(args.ep):
         path = rollout(
             env,
             policy,
@@ -24,6 +28,22 @@ def simulate_policy(args):
             render=True,
             sleep=args.S,
         )
+        if np.any(path['rewards'] == -1):
+            print('-1 reward detected')
+            num_fail += 1
+            last_obs = np.moveaxis(np.reshape(path['observations'][-1], (3, 33, 33)), 0, -1)
+            last_next_obs = np.moveaxis(np.reshape(path['next_observations'][-1], (3, 33, 33)), 0, -1)
+            last_obs = (last_obs * 33 + 128).astype(np.uint8)
+            last_next_obs = (last_next_obs * 33 + 128).astype(np.uint8)
+            fig = plt.figure(figsize=(10, 10))
+            fig.add_subplot(2, 1, 1)
+            plt.imshow(last_obs)
+            fig.add_subplot(2, 1, 2)
+            plt.imshow(last_next_obs)
+            plt.show()
+            plt.close()
+
+        print('number of failures:', num_fail)
         if hasattr(env, "log_diagnostics"):
             env.log_diagnostics([path])
         logger.dump_tabular()
@@ -33,6 +53,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str,
                         help='path to the snapshot file')
+    parser.add_argument('--ep', type=int, default=1000,
+                        help='# of episodes to run')
     parser.add_argument('--H', type=int, default=100,
                         help='Max length of rollout')
     parser.add_argument('--S', type=float, default=1,

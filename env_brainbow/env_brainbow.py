@@ -60,15 +60,15 @@ class EnvBrainbow(gym.Env):
 
             self.offset_list.append(self.cur_point)
 
-            # if color is not matched, terminate with -1 reward
-            if not np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]):
-                return np.zeros((self.fov * self.fov * self.num_ch)), -1, True, {}
-
             # get patch and rotate the image if required
             patch = self.img_volume[self.cur_point[0] - self.rad:self.cur_point[0] + self.rad + 1,
                     self.cur_point[1] - self.rad:self.cur_point[1] + self.rad + 1]  # (fov, fov, 3)
             if self.cur_rotate is not None:
                 patch = cv2.rotate(patch, self.cur_rotate)
+
+            # if color is not matched, terminate with -1 reward
+            if not np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]):
+                return np.moveaxis(patch, -1, 0).flatten(), -1, True, {}
 
             return np.moveaxis(patch, -1, 0).flatten(), 1, False, {}
 
