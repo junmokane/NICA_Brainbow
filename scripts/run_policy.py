@@ -25,10 +25,10 @@ def simulate_policy(args):
             env,
             policy,
             max_path_length=args.H,
-            render=True,
+            render=False,
             sleep=args.S,
         )
-        if np.any(path['rewards'] == -1):
+        if args.de and np.any(path['rewards'] == -1):
             print('-1 reward detected')
             num_fail += 1
             last_obs = np.moveaxis(np.reshape(path['observations'][-1], (3, 33, 33)), 0, -1)
@@ -43,16 +43,20 @@ def simulate_policy(args):
             plt.show()
             plt.close()
 
-        print('number of failures:', num_fail)
         if hasattr(env, "log_diagnostics"):
             env.log_diagnostics([path])
         logger.dump_tabular()
+
+    print('number of failures:', num_fail)
+
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('file', type=str,
                         help='path to the snapshot file')
+    parser.add_argument('--de', type=bool, default=False,
+                        help='stop and detect failure case.')
     parser.add_argument('--ep', type=int, default=1000,
                         help='# of episodes to run')
     parser.add_argument('--H', type=int, default=100,
