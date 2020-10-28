@@ -28,20 +28,20 @@ def simulate_policy(args):
             render=False,
             sleep=args.S,
         )
-        if args.de and np.any(path['rewards'] == -1):
-            print('-1 reward detected')
+        if np.any(path['rewards'] == -1):
             num_fail += 1
-            last_obs = np.moveaxis(np.reshape(path['observations'][-1], (3, 33, 33)), 0, -1)
-            last_next_obs = np.moveaxis(np.reshape(path['next_observations'][-1], (3, 33, 33)), 0, -1)
-            last_obs = (last_obs * 33 + 128).astype(np.uint8)
-            last_next_obs = (last_next_obs * 33 + 128).astype(np.uint8)
-            fig = plt.figure(figsize=(10, 10))
-            fig.add_subplot(2, 1, 1)
-            plt.imshow(last_obs)
-            fig.add_subplot(2, 1, 2)
-            plt.imshow(last_next_obs)
-            plt.show()
-            plt.close()
+            if args.de:
+                last_obs = np.moveaxis(np.reshape(path['observations'][-1], (3, 33, 33)), 0, -1)
+                last_next_obs = np.moveaxis(np.reshape(path['next_observations'][-1], (3, 33, 33)), 0, -1)
+                last_obs = (last_obs * 33 + 128).astype(np.uint8)
+                last_next_obs = (last_next_obs * 33 + 128).astype(np.uint8)
+                fig = plt.figure(figsize=(10, 10))
+                fig.add_subplot(2, 1, 1)
+                plt.imshow(last_obs)
+                fig.add_subplot(2, 1, 2)
+                plt.imshow(last_next_obs)
+                plt.show()
+                plt.close()
 
         if hasattr(env, "log_diagnostics"):
             env.log_diagnostics([path])
