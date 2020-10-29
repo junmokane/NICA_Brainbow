@@ -1,7 +1,7 @@
 from env_brainbow.env_brainbow import EnvBrainbow
 import matplotlib.pyplot as plt
 import numpy as np
-
+import time
 
 
 fov, delta = 33, 8
@@ -16,10 +16,11 @@ obs = env.reset()
 
 for _ in range(10000):
     env.render()
-    fig = plt.figure(figsize=(10, 10))
-    plt.imshow(np.zeros((33, 33, 3)))
-    plt.show()
-    plt.close()
+    time.sleep(0.5)
+    #fig = plt.figure(figsize=(10, 10))
+    #plt.imshow(np.zeros((33, 33, 3)))
+    #plt.show()
+    #plt.close()
     #plt.imshow((obs * 33 + 128).astype(np.uint8), vmin=0, vmax=255)
     #plt.show()
     #plt.close()
