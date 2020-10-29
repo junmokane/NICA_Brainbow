@@ -18,7 +18,7 @@ from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
 from rlkit.launchers.launcher_util import setup_logger
 from rlkit.samplers.data_collector import MdpPathCollector
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
-from env_brainbow.env_brainbow import EnvBrainbow
+from env_brainbow.env_synthetic import EnvBrainbow
 
 
 def experiment(variant):

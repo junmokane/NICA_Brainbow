@@ -1,4 +1,4 @@
-from env_brainbow.env_brainbow import EnvBrainbow
+from env_brainbow.env_synthetic import EnvBrainbow
 import matplotlib.pyplot as plt
 import numpy as np
 import time

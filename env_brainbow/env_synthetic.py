@@ -4,9 +4,6 @@ from gym import spaces
 from gym.utils import seeding
 import skimage.io as skio
 import cv2
-from numpy.linalg import norm
-from sklearn.metrics.pairwise import cosine_similarity
-
 
 class EnvBrainbow(gym.Env):
     ''' Custom Environment that follows gym interface '''
@@ -21,8 +18,6 @@ class EnvBrainbow(gym.Env):
         self.rad = fov // 2
         self.delta = delta
         self.num_ch = num_ch
-        self.img_mean = img_mean
-        self.img_stddev = img_stddev
         self.dir_map = {'0': np.array([0, delta]), '1': np.array([0, -delta]),
                         '2': np.array([delta, 0]), '3': np.array([-delta, 0])}
         self.rotate_map = {'0': cv2.ROTATE_90_COUNTERCLOCKWISE,
@@ -39,7 +34,7 @@ class EnvBrainbow(gym.Env):
         ''' -------------------------------------- '''
         ''' parameters defined every env.reset()   '''
         self.start_point = None  # starting point
-        self.start_color = None  # starting color np.uint8
+        self.start_color = None  # starting color
         self.cur_point = None  # current point
         self.cur_vol = -1  # current volume
         self.cur_ind = -1  # current index
@@ -72,9 +67,7 @@ class EnvBrainbow(gym.Env):
                 patch = cv2.rotate(patch, self.cur_rotate)
 
             # if color is not matched, terminate with -1 reward
-            cur_color = (self.img_volume[self.cur_point[0], self.cur_point[1]]) * self.img_stddev + self.img_mean
-            cosine_val = (cur_color @ self.start_color.T) / (norm(cur_color)*norm(self.start_color))
-            if np.all(cur_color < 30) or cosine_val < 0.9:
+            if not np.all(self.start_color == self.img_volume[self.cur_point[0], self.cur_point[1]]):
                 return np.moveaxis(patch, -1, 0).flatten(), -1, True, {}
 
             return np.moveaxis(patch, -1, 0).flatten(), 1, False, {}
@@ -104,7 +97,7 @@ class EnvBrainbow(gym.Env):
         self.img_volume = self.img_volume[self.start_point[0]]  # (y, x, 3)
         self.img_volume_shape = self.img_volume.shape
         self.start_point = self.start_point[1:]  # [y, x]
-        self.start_color = (self.img_volume[self.start_point[0], self.start_point[1]]) * self.img_stddev + self.img_mean
+        self.start_color = self.img_volume[self.start_point[0], self.start_point[1]]
 
         # start skeletonization
         self.cur_point = self.start_point
@@ -170,12 +163,11 @@ class EnvBrainbow(gym.Env):
                 print('shape : ' + str(img_volume.shape) + ' data type : ' + str(img_volume.dtype))
                 continue
             z, y, x, _ = img_volume.shape
-
+            assert z == y == x
             # Coordinate processing
-            coord = np.argwhere(np.any(img_volume > 100, axis=3))  # take foreground pixel with threshold
+            coord = np.argwhere(np.any(img_volume != 0, axis=3))  # take nonzero coordinate
             coord = coord[np.all(coord % coord_interval == 0, axis=1)]  # take only multiples of coord_interval
-            coord = coord[np.all(coord >= self.rad, axis=1)
-                          & (coord[:, 1] < y-self.rad) & (coord[:, 2] < x-self.rad)]  # remove boundary
+            coord = coord[np.all(coord >= self.rad, axis=1) & np.all(coord < z-self.rad, axis=1)]  # remove boundary
             self.np_random.shuffle(coord)
             coord_len_map.append(len(coord))
             # Normalization
