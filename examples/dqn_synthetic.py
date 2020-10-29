@@ -18,17 +18,17 @@ from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
 from rlkit.launchers.launcher_util import setup_logger
 from rlkit.samplers.data_collector import MdpPathCollector
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
-from env_brainbow.env_brainbow import EnvBrainbow
+from env_brainbow.env_synthetic import EnvSynthetic
 
 
 def experiment(variant):
     fov, delta, num_ch = 33, 8, 3
-    expl_env = EnvBrainbow('0:data/brainbow/training_sample_1.tif',
-                           coord_interval=1, img_mean=128, img_stddev=33,
-                           num_ch=3, fov=fov, delta=delta, seed=0)
-    eval_env = EnvBrainbow('0:data/brainbow/training_sample_1.tif',
-                           coord_interval=1, img_mean=128, img_stddev=33,
-                           num_ch=3, fov=fov, delta=delta, seed=0)
+    expl_env = EnvSynthetic('0:data/training_sample/training_sample_1.tif'
+                           ',1:data/training_sample/training_sample_2.tif',
+                           coord_interval=4, img_mean=128, img_stddev=33, num_ch=num_ch, fov=fov, delta=delta, seed=0)
+    eval_env = EnvSynthetic('0:data/training_sample/training_sample_1.tif'
+                           ',1:data/training_sample/training_sample_2.tif',
+                           coord_interval=4, img_mean=128, img_stddev=33, num_ch=num_ch, fov=fov, delta=delta, seed=0)
     obs_dim = expl_env.observation_space.low.shape  # 33, 33, 3
     action_dim = eval_env.action_space.n  # 2
     kernel_sizes = [4, 4, 3]
@@ -106,7 +106,7 @@ def experiment(variant):
 if __name__ == "__main__":
     # noinspection PyTypeChecker
     parser = argparse.ArgumentParser(description='DQN-runs')
-    parser.add_argument("--env", type=str, default='EnvBrainbow')
+    parser.add_argument("--env", type=str, default='EnvSynthetic')
     parser.add_argument("--gpu", default='0', type=str)
     parser.add_argument('--seed', default=0, type=int)
     args = parser.parse_args()

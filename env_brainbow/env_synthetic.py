@@ -5,12 +5,12 @@ from gym.utils import seeding
 import skimage.io as skio
 import cv2
 
-class EnvBrainbow(gym.Env):
+class EnvSynthetic(gym.Env):
     ''' Custom Environment that follows gym interface '''
     metadata = {'render.modes': ['human']}
 
     def __init__(self, data_volumes, coord_interval, img_mean, img_stddev, num_ch, fov, delta, seed):
-        super(EnvBrainbow, self).__init__()
+        super(EnvSynthetic, self).__init__()
         self.seed(seed)
 
         # define basic parameters
