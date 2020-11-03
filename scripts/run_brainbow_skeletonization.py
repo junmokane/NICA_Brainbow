@@ -137,23 +137,23 @@ def simulate_policy(args):
             bottom = [c_y + delta, c_x]
 
             if a_t == 1:
-                img_plane_tmp[c_y - delta:c_y + 1, c_x] = color
                 if top not in V and is_fov_boundary(img_plane_shape, rad, top):
+                    img_plane_tmp[c_y - delta:c_y + 1, c_x] = color
                     Q.append(top)
                     V.append(top)
             if a_l == 1:
-                img_plane_tmp[c_y, c_x - delta:c_x + 1] = color
                 if left not in V and is_fov_boundary(img_plane_shape, rad, left):
+                    img_plane_tmp[c_y, c_x - delta:c_x + 1] = color
                     Q.append(left)
                     V.append(left)
             if a_r == 1:
-                img_plane_tmp[c_y, c_x:c_x + delta + 1] = color
                 if right not in V and is_fov_boundary(img_plane_shape, rad, right):
+                    img_plane_tmp[c_y, c_x:c_x + delta + 1] = color
                     Q.append(right)
                     V.append(right)
             if a_b == 1:
-                img_plane_tmp[c_y:c_y + delta + 1, c_x] = color
                 if bottom not in V and is_fov_boundary(img_plane_shape, rad, bottom):
+                    img_plane_tmp[c_y:c_y + delta + 1, c_x] = color
                     Q.append(bottom)
                     V.append(bottom)
 
