@@ -169,13 +169,16 @@ class EnvBrainbow(gym.Env):
                 print('loading image volume ' + volname + ' is not valid.')
                 print('shape : ' + str(img_volume.shape) + ' data type : ' + str(img_volume.dtype))
                 continue
+
+            img_volume = img_volume[:, 475:, ...]  # Now the size is 113x700x700
             z, y, x, _ = img_volume.shape
 
             # Coordinate processing
             coord = np.argwhere(np.any(img_volume > 100, axis=3))  # take foreground pixel with threshold
             coord = coord[np.all(coord % coord_interval == 0, axis=1)]  # take only multiples of coord_interval
-            coord = coord[np.all(coord >= self.rad, axis=1)
-                          & (coord[:, 1] < y-self.rad) & (coord[:, 2] < x-self.rad)]  # remove boundary
+            coord = coord[np.all(coord[:, 1:3] >= 3 * self.rad, axis=1)
+                          & (coord[:, 1] < y - 3 * self.rad)
+                          & (coord[:, 2] < x - 3 * self.rad)]  # remove boundary with more margin 3x(rad)
             self.np_random.shuffle(coord)
             coord_len_map.append(len(coord))
             # Normalization

@@ -30,6 +30,9 @@ def main():
         p = [48, 250, 250]
         p_z, p_y, p_x = p
 
+        plt.imshow(img_volume[p_z, 475:])
+        plt.show()
+
         img_volume_copy = np.copy(img_volume)
         # Normalization
         img_volume = img_volume.astype(np.float32)
@@ -57,7 +60,7 @@ def main():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='test-brainbow')
-    parser.add_argument("--file", type=str, default='0:data/brainbow/training_sample_1.tif')
+    parser.add_argument("--file", type=str, default='0:data/brainbow/training_sample.tif')
     args = parser.parse_args()
 
     main()

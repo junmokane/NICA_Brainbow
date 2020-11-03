@@ -22,18 +22,18 @@ from env_brainbow.env_brainbow import EnvBrainbow
 
 
 def experiment(variant):
-    fov, delta, num_ch = 33, 8, 3
-    expl_env = EnvBrainbow('0:data/brainbow/training_sample_1.tif',
-                           coord_interval=1, img_mean=128, img_stddev=33,
+    fov, delta, num_ch = 13, 3, 3
+    expl_env = EnvBrainbow('0:data/brainbow/training_sample.tif',
+                           coord_interval=2, img_mean=128, img_stddev=33,
                            num_ch=3, fov=fov, delta=delta, seed=0)
-    eval_env = EnvBrainbow('0:data/brainbow/training_sample_1.tif',
-                           coord_interval=1, img_mean=128, img_stddev=33,
+    eval_env = EnvBrainbow('0:data/brainbow/training_sample.tif',
+                           coord_interval=2, img_mean=128, img_stddev=33,
                            num_ch=3, fov=fov, delta=delta, seed=0)
-    obs_dim = expl_env.observation_space.low.shape  # 33, 33, 3
+    obs_dim = expl_env.observation_space.low.shape  # 13, 13, 3
     action_dim = eval_env.action_space.n  # 2
-    kernel_sizes = [4, 4, 3]
+    kernel_sizes = [3, 3, 3]
     n_channels = [32, 64, 64]
-    strides = [2, 2, 1]
+    strides = [1, 1, 1]
     paddings = [0, 0, 0]
     hidden_sizes = [512]
 
@@ -64,6 +64,7 @@ def experiment(variant):
         batch_norm_fc=False
     )
 
+    print(qf)
     qf_criterion = nn.MSELoss()
     eval_policy = ArgmaxDiscretePolicy(qf)
     expl_policy = PolicyWrappedWithExplorationStrategy(
@@ -117,7 +118,7 @@ if __name__ == "__main__":
         layer_size=256,
         replay_buffer_size=int(1E6),
         algorithm_kwargs=dict(
-            num_epochs=1000,
+            num_epochs=2000,
             num_eval_steps_per_epoch=5000,
             num_trains_per_train_loop=1000,
             num_expl_steps_per_train_loop=1000,
@@ -137,7 +138,7 @@ if __name__ == "__main__":
                  variant_log_file="variant.json",
                  tabular_log_file="progress.csv",
                  snapshot_mode="gap_and_last",
-                 snapshot_gap=50,
+                 snapshot_gap=100,
                  log_tabular_only=False,
                  log_dir=None,
                  git_infos=None,
